@@ -1,0 +1,23 @@
+# .renderignore
+/.git
+/node_modules
+/vendor
+/storage/app/public
+/storage/logs
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/views
+.env
+.env.local
+.env.testing
+.env.example
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+.phpunit.result.cache
+.php_cs.cache
+docker-compose.yml
+Dockerfile
+docker-compose.override.yml
+tests/

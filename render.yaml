@@ -1,0 +1,56 @@
+# render.yaml
+services:
+  - type: web
+    name: laravel-backend-render
+    env: php
+    region: ohio  # o virginia, oregon según tu preferencia
+    plan: free    # o starter, pro según necesidades
+    
+    # COMANDOS DE CONSTRUCCIÓN
+    buildCommand: |
+      # Instalar dependencias
+      composer install --no-dev --optimize-autoloader
+      
+      # Copiar archivo de producción
+      cp .env.production .env
+      
+      # Generar clave si no existe en .env.production
+      if ! grep -q "APP_KEY=base64:" .env; then
+        php artisan key:generate --force
+      fi
+      
+      # Optimizar Laravel
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+      
+      # Migrar base de datos
+      php artisan migrate --force
+      
+      # Crear enlace de storage
+      php artisan storage:link
+      
+    # COMANDO DE INICIO
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    
+    # VARIABLES DE ENTORNO (se sobrescriben las de .env)
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: stderr
+    
+    # HEALTH CHECK (opcional pero recomendado)
+    healthCheckPath: /api/health
+    initialDelaySec: 30
+    
+    # RECURSOS
+    autoDeploy: true
+    branch: main
+    
+    # PLAN FREE: limitaciones
+    # - 750 horas/mes (aprox 31 días)
+    # - Se duerme después de 15 min inactivo
+    # - Auto-despierta con nueva solicitud
